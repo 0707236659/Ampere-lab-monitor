@@ -51,7 +51,7 @@ type DraftFilters = {
 
 const defaultFilters: DraftFilters = {
   search: "",
-  sort: "status",
+  sort: "name",
   status: "All",
   factoryId: "all",
 };
@@ -111,7 +111,8 @@ export function FactoryOverviewPage() {
 
     list = [...list].sort((a, b) => {
       if (applied.sort === "passRate") return b.passRate - a.passRate;
-      if (applied.sort === "name") return a.name.localeCompare(b.name);
+      if (applied.sort === "name")
+        return a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" });
       const order = { Critical: 0, Attention: 1, Healthy: 2 };
       return order[a.status] - order[b.status];
     });

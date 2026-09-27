@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { fakeFetch } from "@/lib/fake-fetch";
 
-export function useFakeFetch<T>(source: T, delayMs = 800) {
+export function useFakeFetch<T>(source: T, delayMs = 2000) {
   const [data, setData] = useState<T | null>(null);
   const [loading, setLoading] = useState(true);
   const [tick, setTick] = useState(0);

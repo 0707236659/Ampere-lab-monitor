@@ -24,7 +24,6 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import factoryPayload from "@/data/factories.json";
 
 const navItems = [
   { href: "/", label: "Home", icon: Home },
@@ -43,6 +42,18 @@ type RefreshContextValue = {
 
 const RefreshContext = createContext<RefreshContextValue | null>(null);
 
+/** Format a Date as "MMM DD, YYYY HH:MM" — e.g. "Sep 27, 2026 09:41" */
+function formatTimestamp(date: Date): string {
+  return date.toLocaleString("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+}
+
 export function useDashboardRefresh() {
   const value = useContext(RefreshContext);
   if (!value) {
@@ -54,22 +65,25 @@ export function useDashboardRefresh() {
 export function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [refetchFn, setRefetchFn] = useState<(() => void) | null>(null);
+  // Real-time: stamp when the shell mounts (= page load), update on each refetch
+  const [lastUpdated, setLastUpdated] = useState(() => formatTimestamp(new Date()));
 
   const registerRefetch = useCallback((fn: (() => void) | null) => {
     setRefetchFn(() => fn);
   }, []);
 
   const refetch = useCallback(() => {
+    setLastUpdated(formatTimestamp(new Date()));
     refetchFn?.();
   }, [refetchFn]);
 
   const contextValue = useMemo(
     () => ({
-      lastUpdated: factoryPayload.lastUpdated,
+      lastUpdated,
       registerRefetch,
       refetch,
     }),
-    [registerRefetch, refetch],
+    [lastUpdated, registerRefetch, refetch],
   );
 
   return (
